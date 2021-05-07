@@ -2,26 +2,48 @@
 if (process.env.NODE_ENV !== 'production') {
 	require('dotenv').config()
 }
-const aedes = require('aedes')()
-const server = require('net').createServer(aedes.handle)
-// const mqtt = require('mqtt')
 
-const startBroker = async () => {
+// const cluster = require('cluster')
+// const mqemitter = require('mqemitter-mongodb')
+// const mongoPersistence = require('aedes-persistence-mongodb')
+
+const aedes = require('aedes')()
+// 	{
+// 	id: `BROKER_${cluster.worker.id}`,
+// 	mq: mqemitter({
+// 		url: process.env.MONGODB_URL
+// 	}),
+// 	persistence: mongoPersistence({
+// 		url: process.env.MONGODB_URL,
+// 		// Optional TTL settings TODO remove
+// 		ttl: {
+// 			packets: 300, // No of seconds
+// 			subscriptions: 300
+// 		}
+// 	})
+// }
+
+const broker = require('net').createServer(aedes.handle)
+const mongoClient = require('mongodb').MongoClient
+
+const startBroker = () => {
 	return new Promise((res, rej) => {
-		server.listen(process.env.PORT, () => {
+		broker.listen(process.env.PORT, () => {
 			console.log(`MQTT broker started on port ${process.env.PORT}`)
 			return res
 		})
 	})
 }
 
-const start = async () => {
+;(start = async () => {
 	try {
 		await startBroker()
-		// await mqttClient()
 	} catch (err) {
 		console.error(`🛑 Error: ${err}`)
 		process.exit()
 	}
-}
-start()
+})()
+
+aedes.on('publish', (packet, client) => {
+	console.log(packet.topic, packet.payload.toString())
+})

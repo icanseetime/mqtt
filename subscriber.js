@@ -3,18 +3,18 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const mqtt = require('mqtt')
 const client = mqtt.connect(`mqtt://localhost:${process.env.PORT}`)
-const topic = 'hello'
+const topic = '/lights/#'
 
-console.log('🚧 Connecting to MQTT client')
+console.log('🚧 Connecting to MQTT subscriber')
 
 client.on('connect', (ack) => {
-	console.log('✅ MQTT client connected!')
+	console.log('✅ MQTT subscriber connected!')
 	client.subscribe(topic)
 })
 
 client.on('message', (topic, message) => {
 	console.log(
-		`📩 MQTT client message.\n\tTopic: ${topic}.\n\tMessage: ${message.toString()}`
+		`📩 MQTT subscriber received message\n\tTopic: ${topic}\n\tMessage: ${message.toString()}`
 	)
 })
 

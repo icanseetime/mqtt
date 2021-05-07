@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 const mqtt = require('mqtt')
 
 const client = mqtt.connect(`mqtt://localhost:${process.env.PORT}`)
-const topic = 'hello'
+const topic = '/lights/test'
 const message = 'This is a message'
 
 console.log('🚧 Connecting to MQTT publisher')
