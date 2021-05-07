@@ -1,0 +1,22 @@
+{
+    "Data": {
+        "SOM": {
+            "Tab": [
+                {
+                    "Values": {
+                        "ExpandedValues": null,
+                        "ID": "msorgrole"
+                    },
+                    "ID": "OrgRole"
+                },
+                {
+                    "Values": {
+                        "ExpandedValues": null,
+                        "ID": "msorg"
+                    },
+                    "ID": "Organization"
+                }
+            ]
+        }
+    }
+}
