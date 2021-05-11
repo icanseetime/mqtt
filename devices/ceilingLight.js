@@ -4,10 +4,10 @@ if (process.env.NODE_ENV !== 'production') {
 const mqtt = require('mqtt')
 const client = mqtt.connect(`mqtt://localhost:${process.env.PORT}`)
 const deviceType = 'lights'
-const deviceName = 'test'
+const deviceName = 'ceiling'
 const topics = [`home/${deviceType}`, `/home/${deviceType}/${deviceName}/#`]
 
-console.log('🚧 Connecting to MQTT subscriber')
+console.log(`🚧 Connecting to ${deviceType}:${deviceName}`)
 
 client.on('connect', () => {
 	console.log(`✅ ${deviceType}:${deviceName} connected!`)
@@ -24,11 +24,11 @@ client.on('message', (topic, message) => {
 		message = JSON.parse(message)
 		message.e.forEach((entry) => {
 			if (entry.n == 'brightness') {
-				if (entry.v > 0) {
+				if (entry.v < 0) {
 					console.log(
 						`💡 ${deviceType}:${deviceName} set brightness to ${
 							entry.v * 100
-						}%`
+						}`
 					)
 				} else {
 					console.log(`💡 ${deviceType}:${deviceName} turned off`)
