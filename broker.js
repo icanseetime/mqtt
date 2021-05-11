@@ -35,7 +35,7 @@ const { Light, Heater } = require('./models')
 aedes.on('publish', async (packet) => {
 	try {
 		console.log(
-			`Topic: ${packet.topic}\nPayload: ${packet.payload.toString()}\n\n`
+			`Topic: ${packet.topic}\nPayload: ${packet.payload.toString()}\n`
 		)
 		// Ignore system topics
 		if (!packet.topic.startsWith('$SYS')) {
@@ -43,7 +43,7 @@ aedes.on('publish', async (packet) => {
 			let values
 			if (packet.payload.toString().startsWith('{')) {
 				// JSON
-				values = packet.payload // TODO: check this
+				values = JSON.parse(packet.payload) // TODO: check this
 			} else if (packet.payload.toString().startsWith('<')) {
 				// XML
 				xml2js(packet.payload, (err, result) => {
@@ -61,66 +61,71 @@ aedes.on('publish', async (packet) => {
 				// When phone moves outside the location area, send message to turn off lights and lower temperature to 20℃
 				if (packet.topic.includes('phonegps')) {
 					// Lights
-					let payload = {
-						bn: 'broker',
-						bt: Date.now(),
-						e: [
-							{
-								n: 'brightness',
-								u: '/',
-								v: 0
-							}
-						]
-					}
-					await aedes.publish('/home/lights', JSON.stringify(payload))
+					await aedes.publish({
+						topic: '/home/lights',
+						payload: JSON.stringify({
+							bn: 'broker',
+							bt: Date.now(),
+							e: [
+								{
+									n: 'brightness',
+									u: '/',
+									v: 0
+								}
+							]
+						})
+					})
 
 					// Heaters
-					payload = {
-						bn: 'broker',
-						bt: Date.now(),
-						e: [
-							{
-								n: 'temperature',
-								u: 'Cel',
-								v: 20
-							}
-						]
-					}
-					await aedes.publish('/home/lights', JSON.stringify(payload))
+					await aedes.publish({
+						topic: '/home/heaters',
+						payload: JSON.stringify({
+							bn: 'broker',
+							bt: Date.now(),
+							e: [
+								{
+									n: 'temperature',
+									u: 'Cel',
+									v: 20
+								}
+							]
+						})
+					})
 				}
 
 				// When motion is detected, send message to turn lights on at 50% and raise temperature to 23℃
 				if (packet.topic.includes('motion')) {
 					// Lights
-					let payload = {
-						bn: 'broker',
-						bt: Date.now(),
-						e: [
-							{
-								n: 'brightness',
-								u: '/',
-								v: 0.5
-							}
-						]
-					}
-					console.log(1)
-					await aedes.publish('/home/lights', JSON.stringify(payload))
-					console.log(2)
+					aedes.publish({
+						topic: '/home/lights',
+						payload: JSON.stringify({
+							bn: 'broker',
+							bt: Date.now(),
+							e: [
+								{
+									n: 'brightness',
+									u: '/',
+									v: 0.5
+								}
+							]
+						})
+					})
+
 					// Heaters
-					payload = {
-						bn: 'broker',
-						bt: Date.now(),
-						e: [
-							{
-								n: 'temperature',
-								u: 'Cel',
-								v: 23
-							}
-						]
-					}
-					console.log(3)
-					await aedes.publish('/home/lights', JSON.stringify(payload))
-					console.log(4)
+					aedes.publish({
+						topic: '/home/heaters',
+						payload: JSON.stringify({
+							bn: 'broker',
+							bt: Date.now(),
+							e: [
+								{
+									n: 'temperature',
+									u: 'Cel',
+									v: 23
+								}
+							]
+						})
+					})
 				}
 			} else if (
 				packet.topic.includes('lights') &&
@@ -140,7 +145,7 @@ aedes.on('publish', async (packet) => {
 					{ name: values.bn, brightness: brightness },
 					{ upsert: true }
 				)
-				console.log(`💡 Status of ${values.bn} saved to DB`)
+				console.log(`💡 Status of ${values.bn} saved to DB\n`)
 			} else if (
 				packet.topic.includes('heaters') &&
 				values.bn !== 'broker'
@@ -159,10 +164,10 @@ aedes.on('publish', async (packet) => {
 					{ name: values.bn, degrees: temp },
 					{ upsert: true }
 				)
-				console.log(`🔥 Status of ${values.bn} saved to DB`)
+				console.log(`🔥 Status of ${values.bn} saved to DB\n`)
 			}
 		}
 	} catch (err) {
-		console.log(`❌ ${err}`)
+		console.error(`❌ ${err}`)
 	}
 })

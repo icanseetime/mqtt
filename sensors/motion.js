@@ -16,10 +16,14 @@ const message =
 
 console.log(`🚧 Connecting to ${deviceType}:${deviceName}...`)
 
-client.on('connect', async () => {
+client.on('connect', () => {
 	console.log(`✅ ${deviceType}:${deviceName} connected!`)
 })
 
 // Publish message
 client.publish(topic, message)
 console.log(`📨 Message sent from ${deviceType}:${deviceName} : ${message}`)
+
+client.on('error', (err) => {
+	console.log(`❌ ${err}`)
+})
