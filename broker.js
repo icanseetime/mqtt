@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 const aedes = require('aedes')()
 const broker = require('net').createServer(aedes.handle)
 const xml2js = require('xml2js').parseString
+const exificient = require('exificient.js')
 
 // Database setup
 const mongoose = require('mongoose')
@@ -43,15 +44,15 @@ aedes.on('publish', async (packet) => {
 			let values
 			if (packet.payload.toString().startsWith('{')) {
 				// JSON
-				values = JSON.parse(packet.payload) // TODO: check this
+				values = JSON.parse(packet.payload)
 			} else if (packet.payload.toString().startsWith('<')) {
 				// XML
 				xml2js(packet.payload, (err, result) => {
 					values = result.sensml.senml[0]['$']
 				})
 			} else {
-				// EXI // TODO
-				console.log('EXI?')
+				// EXI
+				values = exificient.EXI4JSON(packet.payload)
 			}
 
 			// Save desired data to MongoDB database
@@ -122,6 +123,25 @@ aedes.on('publish', async (packet) => {
 									n: 'temperature',
 									u: 'Cel',
 									v: 23
+								}
+							]
+						})
+					})
+				}
+
+				// When low temperature is detected, send message to raise temperature of specific heater to 21℃
+				if (packet.topic.includes('temp')) {
+					// Heater
+					aedes.publish({
+						topic: '/home/heaters/panel1',
+						payload: JSON.stringify({
+							bn: 'broker',
+							bt: Date.now(),
+							e: [
+								{
+									n: 'temperature',
+									u: 'Cel',
+									v: 21
 								}
 							]
 						})

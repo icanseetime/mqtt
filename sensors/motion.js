@@ -14,8 +14,8 @@ const deviceName = 'motion'
 const message =
 	'<sensml xmlns="urn:ietf:params:xml:ns:senml"><senml bn="sensors:motion" bt="1620754675" n="detected" vb="true"></senml></sensml>'
 
+// Connect
 console.log(`🚧 Connecting to ${deviceType}:${deviceName}...`)
-
 client.on('connect', () => {
 	console.log(`✅ ${deviceType}:${deviceName} connected!`)
 })
@@ -24,6 +24,7 @@ client.on('connect', () => {
 client.publish(topic, message)
 console.log(`📨 Message sent from ${deviceType}:${deviceName} : ${message}`)
 
+// Error
 client.on('error', (err) => {
 	console.log(`❌ ${err}`)
 })

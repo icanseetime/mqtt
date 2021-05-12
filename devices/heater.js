@@ -18,7 +18,9 @@ client.on('message', (topic, message) => {
 	message = JSON.parse(message)
 	if (message.bn !== `${deviceType}:${deviceName}`) {
 		console.log(
-			`📩 ${deviceType}:${deviceName} received message\n\tTopic: ${topic}\n\tMessage: ${message.toString()}`
+			`📩 ${deviceType}:${deviceName} received message\n\tTopic: ${topic}\n\tMessage: ${JSON.stringify(
+				message
+			)}`
 		)
 
 		// Mock: Set temperature of the heater

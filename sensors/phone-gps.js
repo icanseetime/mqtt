@@ -14,6 +14,7 @@ const deviceName = 'phonegps'
 const message =
 	'{"bn": "sensors:phonegps","bt": 1620754675,"e": [{"u": "lat","v": -37.813629},{"u": "lon","v": 144.963058}]}'
 
+// Connect
 console.log(`🚧 Connecting to ${deviceType}:${deviceName}...`)
 client.on('connect', () => {
 	console.log(`✅ ${deviceType}:${deviceName} connected!`)
@@ -23,6 +24,7 @@ client.on('connect', () => {
 client.publish(topic, message)
 console.log(`📨 Message sent from ${deviceType}:${deviceName} : ${message}`)
 
+// Error
 client.on('error', (err) => {
 	console.log(`❌ ${err}`)
 })
