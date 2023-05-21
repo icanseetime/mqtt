@@ -1,7 +1,5 @@
 # Assignment 2 - MQTT
 
-_- Ida M. R. Gjeitsund_
-
 ---
 
 ## Content
